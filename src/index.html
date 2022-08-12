@@ -162,7 +162,7 @@
                             }
 
                             // Append link to warninfo div
-                            $("#warninfo").append("<a href=\"alert-nwws-osm.php?id=" + indalertid + "&locugc=" + locugc + "&alertversion=" + alertVersion + "\" target=\"_blank\">" + feature.properties.prod_type + " (" + feature.properties.wfo + "#" + feature.properties.event + ") - " + minutesRemaining(unixExpires) + "</a><br />")
+                            $("#warninfo").append("<a href=\"alert-nwws-osm.php?id=" + indalertid + "\" target=\"_blank\">" + feature.properties.prod_type + " (" + feature.properties.wfo + "#" + feature.properties.event + ") - " + minutesRemaining(unixExpires) + "</a><br />")
                         });
                     }
 

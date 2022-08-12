@@ -1,0 +1,16 @@
+{
+    "routes": [
+        { 
+            "route": "/ds",
+            "redirect": "/disclaimer.html"
+        },
+        {
+            "route": "/MD*",
+            "rewrite": "/shortener.html"
+        },
+        {
+            "route": "/WW*",
+            "rewrite": "/shortener.html"
+        }
+    ]
+  }

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <!-- Basic Page Needs -->
+        <meta charset="utf-8">
+        <title>Am I under a severe weather warning? - wx4.me</title>
+        <meta name="description" content="Wx4.Me gives you the quickest look at weather conditions in your area, with a focus on severe weather warnings.">
+        <meta name="author" content="Drew Kirkman">
+        <!-- Mobile Specific Metas -->
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- FONT -->
+        <link href="https://fonts.googleapis.com/css?family=Crete+Round" rel="stylesheet">
+        <!-- CSS -->
+        <link rel="stylesheet" href="css/wx.css">
+        <!-- iOS Settings -->
+        <link rel="apple-touch-icon-precomposed" href="images/wx4me_logo_2020.png">
+        <meta name="apple-mobile-web-app-title" content="Wx4Me">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="orange">
+         
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+        <script>
+
+            // Define a function to grab the value of a query string parameter.
+            function getParameterByName(name, url) {
+                if (!url) url = window.location.href;
+                name = name.replace(/[\[\]]/g, '\\$&');
+                var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+                    results = regex.exec(url);
+                if (!results) return null;
+                if (!results[2]) return '';
+                return decodeURIComponent(results[2].replace(/\+/g, ' '));
+            }
+
+            // Variables we may need later
+            var locugc;
+            var insidePolygons = [];
+            var convOutlookCategories = {
+                8: {name: "HIGH", color: "magenta"},
+                6: {name: "MODERATE", color: "red"},
+                5: {name: "ENHANCED", color: "orange"},
+                4: {name: "SLIGHT", color: "goldenrod"},
+                3: {name: "MARGINAL", color: "green"},
+                2: {name: "NON-SEVERE TSTM", color: "lightgreen"}
+            };
+
+            // Calculate minutes remaining until a given UNIX timestamp
+            function minutesRemaining(expiration) {
+                var currentTimestamp = Math.floor(Date.now() / 1000);
+                var secondsRemaining = expiration - currentTimestamp;
+
+                if (secondsRemaining > 0) {
+                    var minutes = Math.floor(secondsRemaining / 60)
+                    if (minutes == 0) {
+                        return "Less than 1 minute remaining";
+                    } else if (minutes == 1) {
+                        return "1 minute remaining";
+                    } else {
+                        return minutes + " minutes remaining";
+                    }
+                } else {
+                    return "Alert is expired.";
+                } 
+            }
+
+            function showLocation(p) {
+
+                if (getParameterByName("locoverride") == "true") {
+                    console.log("WAIT: Location has been overridden");
+                    latitude = getParameterByName("lat");
+                    longitude = getParameterByName("lon");
+                } else {
+                    // Get user location from browser
+                    latitude = p.coords.latitude;
+                    longitude = p.coords.longitude;
+                }
+
+                console.log("Latitude: " + latitude + " Longitude: " + longitude);
+                // Pull some information about where we are from the location data endpoint.
+
+                // https://mapservices.weather.noaa.gov/static/rest/services/nws_reference_maps/nws_reference_map/MapServer/2/query?where=1%3D1&geometry=<<LONGITUDE>>%2C<<LATITUDE>>&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&outSR=4326&featureEncoding=esriDefault&f=geojson
+                console.log("Getting location info from NWS reference map service endpoint");
+                //var locinfoxhr = $.getJSON("https://svc.wx4.me/loc/locinfo.php?lat=" + latitude + "&lon=" + longitude, function (data) {
+                var locinfoxhr = $.getJSON("https://mapservices.weather.noaa.gov/static/rest/services/nws_reference_maps/nws_reference_map/MapServer/2/query?where=1%3D1&geometry="+longitude+"%2C"+latitude+"&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=false&outSR=4326&featureEncoding=esriDefault&f=geojson", function (data) {
+                    locinfo = data;
+                }).done(function() {
+                    
+                    // Check to make sure we matched to a location
+                    if (locinfo.features.count < 1) {
+                        console.log("locinfo: not a valid county-equivalent");
+                    } else {
+                        console.log("Setting locdata to indicate user location of " + locinfo.features[0].properties.countyname + ", " + locinfo.features[0].properties.state);
+                        $("#locdata").html("Your location's county-equivalent: " + locinfo.features[0].properties.countyname + ", " + locinfo.features[0].properties.state);
+                    }
+
+                    /*
+                    locugc = locinfo.ugcid_lower;
+                    console.log("Setting locdata to indicate user location of " + locinfo.county + ", " + locinfo.state);
+                    $("#locdata").html("For the record, I think you're in " + locinfo.county + ", " + locinfo.state);
+                    
+                    // Are there any watches for this location?
+                    console.log("Querying for any watches");
+                    var locwatchxhr = $.getJSON("https://svc.wx4.me/loc/locwatches3.php?ugc=" + locugc, function(data) {
+                        console.log("locwatches says: " + data.msg);
+                        console.log("locwatches: number of watches for this location... " + data.count);
+                        watchinfo = data;
+                    }).done(function() {
+                        if (watchinfo.count > 0) {
+                            $("#watchinfo").html("You are under the following watch(es):<br />");
+                            for (indwatch in watchinfo.watches) {
+                                $("#watchinfo").append("<a href=\"" + watchinfo.watches[indwatch].shortlink + "\" target=\"_blank\">" + watchinfo.watches[indwatch].name + "</a><br />");
+                            }
+                            $("#watchinforow").css('display','initial');
+                        }
+                    });
+                    */
+                    
+                });
+
+                // Get local forecast and current conditions.
+                console.log("Pulling local forecast and current observation from NWS...");
+                var locobsxhr = $.getJSON("https://forecast.weather.gov/MapClick.php?lat=" + latitude + "&lon=" + longitude + "&unit=0&lg=english&FcstType=json", function (data) {
+                    locobs = data;
+                }).done(function() {
+                    $("#curcon").html("<span style=\"font-weight: bold;\">Current Conditions at " + locobs.currentobservation.id + ":<br class=\"mobileonly\"></span><span>" + locobs.currentobservation.Weather + " " + locobs.currentobservation.Temp + "&deg;F</span>");
+                    $("#fcst").html("<span style=\"font-weight: bold;\">Forecast for " + locobs.time.startPeriodName[0] + ": <br class=\"mobileonly\" /></span><span>" + locobs.data.weather[0] + ", " + locobs.time.tempLabel[0] + " " + locobs.data.temperature[0] + "&deg;F, <abbr title=\"Probability of Precipitation\">POP</abbr> " + (locobs.data.pop[0] || "0") + "%</span>");
+                    $("#curconrow").css('display','initial');
+                    $("#fcstrow").css('display','initial');
+                });
+                
+                // Pull in warning data from NWS
+                console.log("warnings: querying NWS MapServer...");
+                //var locwarning2xhr = $.getJSON("https://svc.wx4.me/loc/locwarnings2.php", function(data) {
+                // Public cloud endpoint: https://mapservices.weather.noaa.gov/eventdriven/rest/services/WWA/watch_warn_adv/MapServer/0/query?where=1%3D1&geometry=<<LONGITUDE>>%2C<<LATITUDE>>&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson
+                var locwarning2xhr = $.getJSON("https://mapservices.weather.noaa.gov/eventdriven/rest/services/WWA/watch_warn_adv/MapServer/0/query?where=1%3D1&geometry="+longitude+"%2C"+latitude+"&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson", function(data) {
+                    warning2info = data;
+                }).done(function() {
+
+                    // Check number of features returned, if result is 0 then we can throw a NO
+                    if (warning2info.features.length < 1) {
+                        // We are not inside any polygons
+                        $("#yesno").html("NO");
+                        $("#loadimg").css('display','none');
+                        $("div#yesnorow").css('display','initial');
+                    } else {
+                        // Something was returned.
+                        console.log("warnings: at least one polygon covers this location");
+                        $("#yesno").html("YES");
+                        $("#loadimg").css('display','none');
+                        $("div#yesnorow").css('display','initial');
+                        $("div#warninforow").css('display', 'initial');
+
+                        warning2info.features.forEach(function(feature) {
+                            console.log("warnings: processing " + feature.properties.prod_type + " " + feature.properties.wfo + " #" + feature.properties.event);
+
+                            // Convert ISO8601 expiration date to Unix epoch
+                            var unixExpires = Math.floor(new Date(feature.properties.expiration).getTime() / 1000);
+
+                            // Make warning id string from VTEC
+                            if (feature.properties.vtec) {
+                                var indalertid = feature.properties.vtec.replace(/\//g, '').replace(/\./g, '-');
+                            }
+
+                            // Append link to warninfo div
+                            $("#warninfo").append("<a href=\"alert-nwws-osm.php?id=" + indalertid + "&locugc=" + locugc + "&alertversion=" + alertVersion + "\" target=\"_blank\">" + feature.properties.prod_type + " (" + feature.properties.wfo + "#" + feature.properties.event + ") - " + minutesRemaining(unixExpires) + "</a><br />")
+                        });
+                    }
+
+                });
+                
+                
+                
+                // Check for day 1 outlook area
+                console.log("Checking SPC day1 outlook");
+                // https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/1/query?where=1%3D1&geometry=<<LONGITUDE>>%2C<<LATITUDE>>&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson
+                // var d1oxhr = $.getJSON("https://svc.wx4.me/loc/locd1o.php?lat=" + latitude + "&lon=" + longitude, function (data) {
+                var d1oxhr = $.getJSON("https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/1/query?where=1%3D1&geometry="+longitude+"%2C"+latitude+"&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson", function (data) {
+                    d1oinfo = data;
+                }).done(function () {
+                    if (d1oinfo.features.length > 0) {
+                        $("#d1o").html('<span style="font-weight: bold;">Today\'s SPC Outlook Risk: <br class="mobileonly" /><span style="color:' + convOutlookCategories[d1oinfo.features[0].properties.dn].color + '">' + convOutlookCategories[d1oinfo.features[0].properties.dn].name + '</span></span> <a target="_blank" href="http://www.spc.noaa.gov/products/outlook/day1otlk.html">(more info)</a>');
+                        $("#d1orow").css('display','initial');
+                    }
+                });
+                
+                // Check for day 2 outlook area
+                console.log("Checking SPC day2 outlook");
+                // https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/9/query?where=1%3D1&geometry=<<LONGITUDE>>%2C<<LATITUDE>>&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson
+                var d2oxhr = $.getJSON("https://mapservices.weather.noaa.gov/vector/rest/services/outlooks/SPC_wx_outlks/MapServer/9/query?where=1%3D1&geometry="+longitude+"%2C"+latitude+"&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson", function (data) {
+                    d2oinfo = data;
+                }).done(function () {
+                    if (d2oinfo.features.length > 0) {
+                        $("#d1o").html('<span style="font-weight: bold;">Tomorrow\'s SPC Outlook Risk: <br class="mobileonly" /><span style="color:' + convOutlookCategories[d2oinfo.features[0].properties.dn].color + '">' + convOutlookCategories[d2oinfo.features[0].properties.dn].name + '</span></span> <a target="_blank" href="http://www.spc.noaa.gov/products/outlook/day2otlk.html">(more info)</a>');
+                        $("#d1orow").css('display','initial');
+                    }
+                });
+    
+            }
+
+            if (getParameterByName("locoverride") != "true") {
+                if (navigator.geolocation) {
+                    console.log("Getting current GPS position...");
+                    navigator.geolocation.getCurrentPosition(showLocation);
+                } else {
+                    console.log("Error: browser does not support geolocation or user has denied location access");
+                    var detail ='<div class="col-12 centertext errortext">Your browser does not support geolocation or you have denied location access!</div>';
+                    document.getElementById("loadimg").innerHTML = detail;
+                }
+            } else {
+                console.log("Calling showLocation due to location override");
+                showLocation();
+            }
+
+        </script>
+        <script type="text/javascript">
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "d53fkebol5");
+        </script>
+    </head>
+    <body>
+        <div class="row">
+            <div class="col-12 centertext">
+                <img src="images/wx4me_banner_2020.png" />
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 centertext"><span style="font-size: 24px; font-weight: bold;">Am I under a severe weather warning?</span></div>
+        </div>
+        <div class="row" id="loadimg">
+            <div class="col-12 loadimg"><img src="images/loading14.gif" /></div>
+        </div>
+        <div class="row showafterdata" id="yesnorow">
+            <div class="col-12 yesno centertext" id="yesno"></div>
+        </div>
+        <div class="row showafterdata" id="warninforow">
+            <div class="col-12 centertext" id="warninfo"></div>
+        </div>
+        <div class="row showafterdata" id="watchinforow">
+            <div class="col-12 centertext" id="watchinfo"></div>
+        </div>
+        <div class="row showafterdata" id="curconrow">
+            <div class="col-12 centertext" id="curcon"></div>
+        </div>
+        <div class="row showafterdata" id="fcstrow">
+            <div class="col-12 centertext" id="fcst"></div>
+        </div>
+        <div class="row showafterdata" id="d1orow">
+            <div class="col-12 centertext" id="d1o"></div>
+        </div>
+        <div class="row showafterdata" id="d2orow">
+            <div class="col-12 centertext" id="d2o"></div>
+        </div>
+        <div class="row">
+            <div class="col-12 centertext">
+                <span id="locdata">Still spinning? You may need to <a href="https://wx4.me/">visit via HTTPS.</a><br />
+                Alternatively, enter your own location with ?locoverride=true&lat=xx.xxx&lon=-xx.xxx at the end of your URL bar</span><br />
+                <a href="/ds">Disclaimer</a>, since this could be life-or-death information.<br /><br />
+                If you find this service valuable, you can <a href="https://paypal.me/kirkmawa" target="_blank">buy me a coffee</a>.<br /><br />
+                <span style="font-weight: bold;">URL Shortener Functions:</span><br />
+                <span style="font-weight: bold;">SPC Watch:</span> https://wx4.me/W####<br />
+                <span style="font-weight: bold;">Mesoscale Discussion:</span> https://wx4.me/MD####<br /><br />
+                <span style="font-weight: bold;"><a href="https://map.wx4.me/" target="_blank">Interactive Warning Map</a></span>
+            </div>
+        </div>
+    </body>
+</html>

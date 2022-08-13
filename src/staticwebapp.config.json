@@ -9,7 +9,7 @@
             "rewrite": "/shortener.html"
         },
         {
-            "route": "/WW*",
+            "route": "/W*",
             "rewrite": "/shortener.html"
         }
     ]

@@ -190,8 +190,8 @@
                     d2oinfo = data;
                 }).done(function () {
                     if (d2oinfo.features.length > 0) {
-                        $("#d1o").html('<span style="font-weight: bold;">Tomorrow\'s SPC Outlook Risk: <br class="mobileonly" /><span style="color:' + convOutlookCategories[d2oinfo.features[0].properties.dn].color + '">' + convOutlookCategories[d2oinfo.features[0].properties.dn].name + '</span></span> <a target="_blank" href="http://www.spc.noaa.gov/products/outlook/day2otlk.html">(more info)</a>');
-                        $("#d1orow").css('display','initial');
+                        $("#d2o").html('<span style="font-weight: bold;">Tomorrow\'s SPC Outlook Risk: <br class="mobileonly" /><span style="color:' + convOutlookCategories[d2oinfo.features[0].properties.dn].color + '">' + convOutlookCategories[d2oinfo.features[0].properties.dn].name + '</span></span> <a target="_blank" href="http://www.spc.noaa.gov/products/outlook/day2otlk.html">(more info)</a>');
+                        $("#d2orow").css('display','initial');
                     }
                 });
     

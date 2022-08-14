@@ -171,7 +171,7 @@
                         $("div#yesnorow").css('display','initial');
 
                         // Trigger toast encouraging user to add to iPhone home screen
-                        if (/^.+(iphone|ipad).+safari/i.test(navigator.userAgent)) {
+                        if ((/^.+(iphone|ipad).+safari/i.test(navigator.userAgent)) && !(window.navigator.standalone)) {
                             toast = new bootstrap.Toast($("#liveToastiPhone"));
                             toast.show();
                         }

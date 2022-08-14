@@ -11,7 +11,12 @@
         <!-- FONT -->
         <link href="https://fonts.googleapis.com/css?family=Crete+Round" rel="stylesheet">
         <!-- CSS -->
-        <link rel="stylesheet" href="css/wx.css">
+        <!-- <link rel="stylesheet" href="css/wx.css"> -->
+
+        <!-- Bootstrap -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
+
         <!-- iOS Settings -->
         <link rel="apple-touch-icon-precomposed" href="images/wx4me_logo_2020.png">
         <meta name="apple-mobile-web-app-title" content="Wx4Me">
@@ -19,6 +24,28 @@
         <meta name="apple-mobile-web-app-status-bar-style" content="default">
          
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+        <style>
+
+            .showafterdata {
+                display: none;
+            }
+
+            .yesno {
+                font-size: 150px;
+                font-weight: bold;
+            }
+
+            .loadimg img {
+                width: 100%;
+            }
+
+            body {
+                font-family: "Crete Round", serif;
+            }
+
+        </style>
+
         <script>
 
             // Define a function to grab the value of a query string parameter.
@@ -142,6 +169,13 @@
                         $("#yesno").html("NO");
                         $("#loadimg").css('display','none');
                         $("div#yesnorow").css('display','initial');
+
+                        // Trigger toast encouraging user to add to iPhone home screen
+                        if (/^.+(iphone|ipad).+safari/i.test(navigator.userAgent)) {
+                            toast = new bootstrap.Toast($("#liveToastiPhone"));
+                            toast.show();
+                        }
+
                     } else {
                         // Something was returned.
                         console.log("warnings: at least one polygon covers this location");
@@ -222,39 +256,39 @@
     </head>
     <body>
         <div class="row">
-            <div class="col-12 centertext">
+            <div class="col-12 text-center">
                 <img src="images/wx4me_banner_2020.png" />
             </div>
         </div>
         <div class="row">
-            <div class="col-12 centertext"><span style="font-size: 24px; font-weight: bold;">Am I under a severe weather warning?</span></div>
+            <div class="col-12 text-center"><span style="font-size: 24px; font-weight: bold;">Am I under a severe weather warning?</span></div>
         </div>
         <div class="row" id="loadimg">
             <div class="col-12 loadimg"><img src="images/loading14.gif" /></div>
         </div>
         <div class="row showafterdata" id="yesnorow">
-            <div class="col-12 yesno centertext" id="yesno"></div>
+            <div class="col-12 yesno text-center" id="yesno"></div>
         </div>
         <div class="row showafterdata" id="warninforow">
-            <div class="col-12 centertext" id="warninfo"></div>
+            <div class="col-12 text-center" id="warninfo"></div>
         </div>
         <div class="row showafterdata" id="watchinforow" style="display: initial;">
-            <div class="col-12 centertext" id="watchinfo">Note: watch information is currently unavailable.</div>
+            <div class="col-12 text-center" id="watchinfo">Note: watch information is currently unavailable.</div>
         </div>
         <div class="row showafterdata" id="curconrow">
-            <div class="col-12 centertext" id="curcon"></div>
+            <div class="col-12 text-center" id="curcon"></div>
         </div>
         <div class="row showafterdata" id="fcstrow">
-            <div class="col-12 centertext" id="fcst"></div>
+            <div class="col-12 text-center" id="fcst"></div>
         </div>
         <div class="row showafterdata" id="d1orow">
-            <div class="col-12 centertext" id="d1o"></div>
+            <div class="col-12 text-center" id="d1o"></div>
         </div>
         <div class="row showafterdata" id="d2orow">
-            <div class="col-12 centertext" id="d2o"></div>
+            <div class="col-12 text-center" id="d2o"></div>
         </div>
         <div class="row">
-            <div class="col-12 centertext">
+            <div class="col-12 text-center mb-3">
                 <span id="locdata">Still spinning? You may need to <a href="https://wx4.me/">visit via HTTPS.</a><br />
                 Alternatively, enter your own location with ?locoverride=true&lat=xx.xxx&lon=-xx.xxx at the end of your URL bar</span><br />
                 <a href="/ds">Disclaimer</a>, since this could be life-or-death information.<br /><br />
@@ -265,5 +299,18 @@
                 <span style="font-weight: bold;"><a href="https://map.wx4.me/" target="_blank">Interactive Warning Map</a></span>
             </div>
         </div>
+        <div class="toast-container position-fixed top-0 end-0 p-3">
+            <div id="liveToastiPhone" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false">
+              <div class="toast-header">
+                <img src="images/wx4me_logo_2020.png" class="rounded me-2" alt="Wx4Me Logo" style="height: 20px;">
+                <strong class="me-auto">Bootstrap</strong>
+                <small>11 mins ago</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+              </div>
+              <div class="toast-body">
+                Add this page as a web app on your iPhone home screen by clicking the <img src="images/ios-share-icon.png" alt="iOS share icon" style="height: 15px;" /> icon and selecting &quot;Add to Home Screen&quot;.
+              </div>
+            </div>
+          </div>
     </body>
 </html>

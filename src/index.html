@@ -201,6 +201,35 @@
                     }
 
                 });
+
+                // get watches from NWS
+                console.log("Getting convective watches");
+                var locwatchxhr = $.getJSON("https://mapservices.weather.noaa.gov/eventdriven/rest/services/WWA/watch_warn_adv/MapServer/1/query?where=prod_type%20like%20%27%25Watch%27&geometry="+longitude+"%2C"+latitude+"&geometryType=esriGeometryPoint&inSR=4326&spatialRel=esriSpatialRelIntersects&outFields=*&returnGeometry=true&outSR=4326&featureEncoding=esriDefault&f=geojson", function(data) {
+                    watchinfo = data;
+                }).done(function() {
+                    if (watchinfo.features.length > 0) {
+                        $("#watchinfo").html("You are under the following watch(es):<br />");
+                        watchinfo.features.forEach(function(feature) {
+                            expirationDate = new Date(feature.properties.expiration);
+                            expireHour = expirationDate.getHours();
+                            if (expireHour == 0) {
+                                // Midnight hour
+                                expireHour = 12;
+                                amPm = "AM";
+                            } else if (expireHour == 12) {
+                                amPm = "PM";
+                            } else if (expireHour > 12) {
+                                expireHour = expireHour - 12;
+                                amPm = "PM";
+                            } else {
+                                amPm = "AM";
+                            }
+                            expireMinute = expirationDate.getMinutes().toString().padStart(2, 0);
+                            $("#watchinfo").append("<a href=\"https://wx4.me/W" + feature.properties.event + "\" target=\"_blank\">" + feature.properties.prod_type + " #" + feature.properties.event +" until " +expireHour+":"+expireMinute+" "+amPm+"</a><br />");
+                        });
+                        $("#watchinforow").css('display','initial');
+                    }
+                });
                 
                 
                 
@@ -276,8 +305,8 @@
         <div class="row showafterdata" id="warninforow">
             <div class="col-12 text-center" id="warninfo"></div>
         </div>
-        <div class="row showafterdata" id="watchinforow" style="display: initial;">
-            <div class="col-12 text-center" id="watchinfo">Note: watch information is currently unavailable.</div>
+        <div class="row showafterdata" id="watchinforow">
+            <div class="col-12 text-center" id="watchinfo"></div>
         </div>
         <div class="row showafterdata" id="curconrow">
             <div class="col-12 text-center" id="curcon"></div>

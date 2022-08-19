@@ -2,7 +2,11 @@
     "routes": [
         { 
             "route": "/ds",
-            "redirect": "/disclaimer.html"
+            "redirect": "/terms.html"
+        },
+        {
+            "route": "/terms",
+            "redirect": "/terms.html"
         },
         {
             "route": "/MD*",

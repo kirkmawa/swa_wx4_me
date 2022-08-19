@@ -255,16 +255,20 @@
         </script>
     </head>
     <body>
-        <div class="row">
+        <div class="row mt-3 mb-1">
             <div class="col-12 text-center">
                 <img src="images/wx4me_banner_2020.png" />
             </div>
         </div>
-        <div class="row">
+        <div class="row mt-2">
             <div class="col-12 text-center"><span style="font-size: 24px; font-weight: bold;">Am I under a severe weather warning?</span></div>
         </div>
         <div class="row" id="loadimg">
-            <div class="col-12 loadimg"><img src="images/loading14.gif" /></div>
+            <div class="text-center">
+                <div role="status" class="spinner-border" style="height: 4rem; width: 4rem;">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
         </div>
         <div class="row showafterdata" id="yesnorow">
             <div class="col-12 yesno text-center" id="yesno"></div>

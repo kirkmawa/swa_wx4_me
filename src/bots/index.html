@@ -61,12 +61,13 @@
       <div class="row justify-content-center" id="bots2">
         <div class="col">
           <p>
-            All data is obtained via <a href="https://www.weather.gov/nwws/" target="_blank">NOAA Weather Wire (NWWS-OI)</a>. 
-            The bot program is written in Python and uses code 
+            All data is obtained via <a href="https://www.weather.gov/nwws/" target="_blank">NOAA Weather Wire (NWWS-OI)</a>, 
+            which is a push technology, as opposed to polling the weather.gov Atom feed or the public IPAWS CAP feed. 
+            The bot accounts are driven by a single program I call the Metabot, which is written in Python and uses code 
             derived from <a href="https://github.com/kirkmawa/nwws-python-client" target="_blank">my fork of Jim Buitt's nwws-python-client</a>.
           </p>
           <p>
-            The NWWS client only responds to WMO headers matching the following regex:
+            Currently, the NWWS client only responds to WMO headers matching the following regex:
             <ul>
               <li><code>"/^wf.+/"</code></li>
               <li><code>"/^wu.+/"</code></li>
@@ -78,7 +79,7 @@
             If you would like to see this adjusted, contact me via <a href="mailto:drew@drewkirkman.com">email</a>, 
             tag me <a href="https://mstdn.social/@kirkman" target="_blank">on Mastodon</a>, 
             or get in touch <a href="https://matrix.to/#/@kirkman:geekch.at" target="_blank">via Matrix</a>. 
-            I am working on opening the source code of the bot, but if you would like to contribute before then, let me know!
+            I am working on opening the source code of the Metabot, but if you would like to contribute before then, let me know!
           </p>
         </div>
       </div>

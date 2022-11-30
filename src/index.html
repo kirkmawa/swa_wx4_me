@@ -117,28 +117,6 @@
                         console.log("Setting locdata to indicate user location of " + locinfo.features[0].properties.countyname + ", " + locinfo.features[0].properties.state);
                         $("#locdata").html("Your location's county-equivalent: " + locinfo.features[0].properties.countyname + ", " + locinfo.features[0].properties.state);
                     }
-
-                    /*
-                    locugc = locinfo.ugcid_lower;
-                    console.log("Setting locdata to indicate user location of " + locinfo.county + ", " + locinfo.state);
-                    $("#locdata").html("For the record, I think you're in " + locinfo.county + ", " + locinfo.state);
-                    
-                    // Are there any watches for this location?
-                    console.log("Querying for any watches");
-                    var locwatchxhr = $.getJSON("https://svc.wx4.me/loc/locwatches3.php?ugc=" + locugc, function(data) {
-                        console.log("locwatches says: " + data.msg);
-                        console.log("locwatches: number of watches for this location... " + data.count);
-                        watchinfo = data;
-                    }).done(function() {
-                        if (watchinfo.count > 0) {
-                            $("#watchinfo").html("You are under the following watch(es):<br />");
-                            for (indwatch in watchinfo.watches) {
-                                $("#watchinfo").append("<a href=\"" + watchinfo.watches[indwatch].shortlink + "\" target=\"_blank\">" + watchinfo.watches[indwatch].name + "</a><br />");
-                            }
-                            $("#watchinforow").css('display','initial');
-                        }
-                    });
-                    */
                     
                 });
 

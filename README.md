@@ -4,7 +4,7 @@ This is the source code for the web application running at https://wx4.me.
 
 ## What this web app does
 
-When visiting this web page from a mobile device, it will prompt the user to provide their location using a standard browser geolocation API. This location data is then cross-referenced against active US [National Weather Service](https://weather.gov/) severe weather alerts. The majority of these alerts since 2007 have been outlined based on geographic polygons rather than political subdivisions or county-equivalents. The user is then informed whether their device's location is inside one of these warning polygons. 
+When visiting this web page from a mobile device, it will prompt the user to provide their location using a standard browser geolocation API. This location data is then cross-referenced against active US [National Weather Service](https://weather.gov/) severe weather alerts. The majority of these alerts since 2007 have been outlined based on geographic polygons rather than political subdivisions or county-equivalents. The user is then informed whether their device's location is inside one of these warning polygons. If so, links are shown to a companion web app running at https://map.wx4.me ([GitHub repo here](https://github.com/kirkmawa/swa_map_wx4_me)).
 
 ### Additional weather data referenced
 * US Storm Prediction Center severe convective weather watches

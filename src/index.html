@@ -126,7 +126,7 @@
                     locobs = data;
                 }).done(function() {
                     $("#curcon").html("<span style=\"font-weight: bold;\">Current Conditions at " + locobs.currentobservation.id + ":<br class=\"mobileonly\"></span><span>" + locobs.currentobservation.Weather + " " + locobs.currentobservation.Temp + "&deg;F</span>");
-                    $("#fcst").html("<span style=\"font-weight: bold;\">Forecast for " + locobs.time.startPeriodName[0] + ": <br class=\"mobileonly\" /></span><span>" + locobs.data.weather[0] + ", " + locobs.time.tempLabel[0] + " " + locobs.data.temperature[0] + "&deg;F, <abbr title=\"Probability of Precipitation\">POP</abbr> " + (locobs.data.pop[0] || "0") + "%</span>");
+                    $("#fcst").html("<span style=\"font-weight: bold;\">Forecast for " + locobs.time.startPeriodName[0] + ": <br class=\"mobileonly\" /></span><span>" + locobs.data.weather[0] + ", " + locobs.time.tempLabel[0] + " " + locobs.data.temperature[0] + "&deg;F, <abbr title=\"Probability of Precipitation\">POP</abbr> " + (locobs.data.pop[0] || "0") + "%</span><br class=\"mobileonly\" /><span><a href=\"https://forecast.weather.gov/MapClick.php?lat=" + latitude + "&lon=" + longitude + "\" target=\"_blank\">Full NWS Forecast</a></span>");
                     $("#curconrow").css('display','initial');
                     $("#fcstrow").css('display','initial');
                 });

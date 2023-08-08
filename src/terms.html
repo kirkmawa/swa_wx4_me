@@ -23,14 +23,22 @@
 
         </style>
 
-        <script type="text/javascript">
-            (function(c,l,a,r,i,t,y){
-                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
-                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-            })(window, document, "clarity", "script", "d53fkebol5");
+        <!-- Matomo -->
+        <script>
+            var _paq = window._paq = window._paq || [];
+            /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+            _paq.push(['trackPageView']);
+            _paq.push(['enableLinkTracking']);
+            (function() {
+            var u="https://analytics.kn9foo.net/";
+            _paq.push(['setTrackerUrl', u+'matomo.php']);
+            _paq.push(['setSiteId', '4']);
+            var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+            g.async=true; g.src=u+'matomo.js'; s.parentNode.insertBefore(g,s);
+            })();
         </script>
-    </head>
+        <!-- End Matomo Code -->
+      </head>
     <body>
         <div class="container">
             <div class="row mt-3 mb-1">
@@ -89,8 +97,8 @@
                         This information is not saved or logged by the application, but is sent to a third party (the US National Weather Service, an agency of the United States federal government) for processing. Refer 
                         to the <a href="https://www.weather.gov/privacy" target="_blank">privacy policy</a> on weather.gov for how this information is used by their systems.
 
-                        The wx4.me and map.wx4.me applications use Microsoft Clarity for web analytics. Any data collected is handled in accordance with the privacy policy 
-                        <a href="https://docs.microsoft.com/en-us/clarity/faq#privacy" target="_blank">found here</a>.
+                        The wx4.me and map.wx4.me applications use a self-hosted Matomo installation for web analytics. Any data collected is used solely in a personal capacity and not given or sold to
+                        any other party.
                     </p>
                 </div>
             </div>
